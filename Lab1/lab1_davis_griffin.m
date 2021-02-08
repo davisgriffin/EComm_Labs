@@ -37,6 +37,7 @@ xm5 = awgn(x,-5);
 x0 = awgn(x,0);
 x10 = awgn(x,10);
 
+% Generating subplots and superimposing noisy signals over base signal
 figure(9)
 subplot(3,1,1), plot(t, x, 'Color', 'blue'); title('x(t) with SNR = -5 dB'); hold on
 plot(t, xm5,  'Color', 'red'); hold off
@@ -44,6 +45,8 @@ subplot(3,1,2), plot(t, x, 'Color', 'blue'); title('x(t) with SNR = 0 dB'); hold
 plot(t, x0,  'Color', 'red'); hold off
 subplot(3,1,3), plot(t, x, 'Color', 'blue'); title('x(t) with SNR = 10 dB'); hold on
 plot(t, x10,  'Color', 'red'); hold off
+
+% Adding common axis labels for the subplots
 ax = axes('Parent',figure(9),'visible','off');
 ax.XLabel.Visible='on';
 ax.YLabel.Visible='on';
@@ -59,3 +62,5 @@ fs = 22000;
 
 m2 = awgn(m,snr);
 sound(m2,fs);
+
+fprintf("The following SNR renders the ABC News audio inaudible: %d dB",snr);
