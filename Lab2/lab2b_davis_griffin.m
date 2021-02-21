@@ -45,14 +45,70 @@ fprintf("Can see from the plot that the prominent signals are 100 Hz, 500 Hz, an
 % Design bandpass filter for each frequency to isolate tones and plot the
 % frequency response
 
-Y = fftshift(y);
-f = -F:df:F-df;
-Y = Y./n;
-Ym = abs(Y);
+[b,a] = butter(2,[95 105]/(fs/2),"bandpass");
+g100 = filter(b,a,y);
 
 figure(3)
-plot(f,Ym)
-title('FFT of the Noisy Data with Negative Components')
-xlabel('Frequency (Hz)')
+plot(t,g100)
+title('100 Hz Bandpass Filter of Noisy Data')
 ylabel('Amplitude')
+xlabel('Time (sec)')
 
+[h,w] = freqz(b,a);
+HM = abs(h);
+n=length(HM);
+f = 0:F/n:F-F/n;
+figure(4)
+plot(f,20*log10(HM))
+title('Frequency Response of 100 Hz Filter')
+ylabel('Amplitude (dB)')
+xlabel('Frequency (Hz)')
+
+% ---------------------------------------
+
+[b,a] = butter(2,[495 505]/(fs/2),"bandpass");
+g500 = filter(b,a,y);
+
+figure(5)
+plot(t,g500)
+title('500 Hz Bandpass Filter of Noisy Data')
+ylabel('Amplitude')
+xlabel('Time (sec)')
+
+[h,w] = freqz(b,a);
+HM = abs(h);
+n=length(HM);
+f = 0:F/n:F-F/n;
+figure(6)
+plot(f,20*log10(HM))
+title('Frequency Response of 500 Hz Filter')
+ylabel('Amplitude (dB)')
+xlabel('Frequency (Hz)')
+
+% ---------------------------------------
+
+[b,a] = butter(2,[895 905]/(fs/2),"bandpass");
+g900 = filter(b,a,y);
+
+figure(7)
+plot(t,g900)
+title('900 Hz Bandpass Filter of Noisy Data')
+ylabel('Amplitude')
+xlabel('Time (sec)')
+
+[h,w] = freqz(b,a);
+HM = abs(h);
+n=length(HM);
+f = 0:F/n:F-F/n;
+figure(8)
+plot(f,20*log10(HM))
+title('Frequency Response of 900 Hz Filter')
+ylabel('Amplitude (dB)')
+xlabel('Frequency (Hz)')
+
+%% Part 4
+% Filter the noisy data with the filters from part 3
+
+g = g100 + g500 + g900;
+figure(9)
+plot(t,g)
