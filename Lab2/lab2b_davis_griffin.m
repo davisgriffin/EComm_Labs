@@ -112,3 +112,6 @@ xlabel('Frequency (Hz)')
 g = g100 + g500 + g900;
 figure(9)
 plot(t,g)
+title('100, 500, and 900 Hz tones combined')
+ylabel('Amplitude')
+xlabel('Time (sec)')
