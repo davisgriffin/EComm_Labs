@@ -35,7 +35,7 @@ g(:,2)=[];                               % only keep one track
 %sound(g,fs);
 d = zeros(round(fs*.064),1);
 g=cat(1,g,d);
-fs
+% fs
 size(g);
 g=cat(1,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g,g);
 d = zeros(fs*7.2,1);
