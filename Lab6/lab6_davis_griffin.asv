@@ -37,11 +37,11 @@ x = floor(rand(1,n)*numel(imgList));
 for i = 1:n
     st = imgList(x(i));
     imgs(:,:,i) = mask(filter2(H,greyscale(imread(sprintf("%s\\%s",st.folder,st.name)))));
-    fprintf("\n%s\n",st.name);
+    fprintf("%s\n",st.name);
     for j = 1:numel(fileList)
         c = normxcorr2(benchmark(:,:,j),imgs(:,:,i));
         figure, surf(c), shading flat
-        fprintf("%g\n",max(max(abs(c))));
+        fprintf(max(max(abs(c))));
 %         c = abs(c);
 %         [ypeak, xpeak] = find(c==max(c(:)));
 %         yoffset = ypeak-dim(1);
@@ -65,7 +65,7 @@ function img = mask(img)
     r_radius_squared = r_radius * r_radius;
     for r = 1:size(img, 1)    % for number of rows of the image
         for c = 1:size(img, 2)    % for number of columns of the image
-            if ( ( (c-h)^2/c_radius_squared + (r-k)^2/r_radius_squared ) <= 1)
+            if ( ( (r-h)^2/r_radius_squared + (c-k)^2/c_radius_squared ) <= 1)
                 img(r, c) = img(r, c);
             else
                 img(r, c) = 0;
