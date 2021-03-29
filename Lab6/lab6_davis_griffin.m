@@ -7,24 +7,21 @@ clc; clear; close all; clear sound;
 %% Read in Benchmark Images
 fileList = ["Lab6-NoiseEye/0.jpg","Lab6-NoiseEye/677.jpg","Lab6-NoiseEye/1515.jpg",...
             "Lab6-NoiseEye/6637.jpg","Lab6-NoiseEye/9161.jpg"];
-dim = size(imread(fileList(1)),1:2); % Get image resolution
+dim = size(mask(imread(fileList(1))),1:2); % Get image resolution
 
-% benchmark = zeros(dim(1),dim(2),numel(fileList)); % initialize array of benchmark images
-H = fspecial('average',10); % averaging filter
-
-% 1- looking straight
-% 2 - looking inside
-% 3 - closed / blinking
-% 4 - looking outside
-% 5 - looking up
+benchmark = zeros(dim(1),dim(2),numel(fileList)); % initialize array of benchmark images
+H = fspecial('average',15); % averaging filter
 
 % Greyscale images to help with correlation
 % Filter helps remove noise artifacts
 % Mask isolates only the parts of the image necessary to analyze
 for i = 1:numel(fileList)
-%     benchmark(:,:,i) = mask(filter2(H,greyscale(imread(fileList(i)))));
-    benchmark(:,:,i) = mask(greyscale(imread(fileList(i))));
+    benchmark(:,:,i) = mask(filter2(H,greyscale(imread(fileList(i))))/255);
 end
+
+figure
+montage(benchmark);
+title("Benchmark Images");
 
 %% Setup Test Images
 % Select several test images at random and greyscale, filter, and mask
@@ -32,24 +29,35 @@ imgList = dir("Lab6-NoiseEye");
 
 n = 10; % number of test images
 x = floor(rand(1,n)*numel(imgList));
-% imgs = ones(dim(1),dim(2),n);
+imgs = ones(dim(1),dim(2),n);
+c1 = 1:numel(fileList);
 
 for i = 1:n
     st = imgList(x(i));
-    imgs(:,:,i) = mask(filter2(H,greyscale(imread(sprintf("%s\\%s",st.folder,st.name)))));
-    fprintf("\n%s\n",st.name);
-    for j = 1:numel(fileList)
-        c = normxcorr2(benchmark(:,:,j),imgs(:,:,i));
-        figure, surf(c), shading flat
-        fprintf("%g\n",max(max(abs(c))));
-%         c = abs(c);
-%         [ypeak, xpeak] = find(c==max(c(:)));
-%         yoffset = ypeak-dim(1);
-%         xoffset = xpeak-dim(2);
+    if find(fileList=="Lab6-NoiseEye/"+st.name)>0
+        % RNG selected a testimage
+        st = imgList(x(i)+1);
     end
+    imgs(:,:,i) = mask(filter2(H,greyscale(imread(sprintf("%s\\%s",st.folder,st.name))))/255);
+    fprintf("\n%s\n",st.name);
+    c1 = 1:numel(fileList);
+    for j = 1:numel(fileList)
+        c(:,:,j) = normxcorr2(benchmark(:,:,j),imgs(:,:,i));
+        c1(j) = max(max(abs(c(:,:,j))));
+    end
+    fprintf("Looking Straight Correlation : %g\n" + ...
+            "Looking Inside Correlation   : %g\n" + ...
+            "Closed / Blinking Correlation: %g\n" + ...
+            "Looking Outside Correlation  : %g\n" + ...
+            "Looking Up Correlation       : %g\n",+ ...
+            c1(1),c1(2),c1(3),c1(4),c1(5));
+    index = find(c1==max(c1));
+    decideEye(index, c);
 end
 
-
+figure
+montage(imgs);
+title("Test Images"), snapnow
 
 %% Functions
 function img = greyscale(in)
@@ -72,4 +80,31 @@ function img = mask(img)
             end
         end
     end
+    img = img(k-r_radius:k+r_radius,h-c_radius:h+c_radius);
+end
+
+function decideEye(index, c)
+    switch index
+        case 1
+            fprintf("Eye is looking straight.\n\n");
+            figure, surf(c(:,:,index)), shading flat
+            title("Eye looking straight")
+        case 2
+            fprintf("Eye is looking inside.\n\n");
+            figure, surf(c(:,:,index)), shading flat
+            title("Eye looking inside")
+        case 3
+            fprintf("Eye is closed / blinking.\n\n");
+            figure, surf(c(:,:,index)), shading flat
+            title("Eye closed / blinking")
+        case 4
+            fprintf("Eye is looking outside.\n\n");
+            figure, surf(c(:,:,index)), shading flat
+            title("Eye looking outside")
+        case 5
+            fprintf("Eye is looking upwards.\n\n");
+            figure, surf(c(:,:,index)), shading flat
+            title("Eye looking upwards")
+    end
+    snapnow
 end
